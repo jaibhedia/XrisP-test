@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+.env
+
+# Hardhat files
+cache/
+artifacts/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage reports
+coverage/
+coverage.json
+
+# Typechain
+typechain/
+typechain-types/
