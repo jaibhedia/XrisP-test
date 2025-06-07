@@ -265,32 +265,6 @@ Each crop type has different characteristics:
 - **Pool Limits**: Minimum stake requirements
 - **Excluded Addresses**: System addresses bypass limits
 
-### Audit Recommendations
-- [ ] External smart contract audit
-- [ ] Formal verification of critical functions
-- [ ] Testnet deployment and community testing
-- [ ] Bug bounty program
-
-## Future Enhancements
-
-### Phase 2 Features
-- [ ] **Land NFTs**: Virtual land ownership system
-- [ ] **Breeding System**: Crop genetics and breeding
-- [ ] **Marketplace**: P2P trading of crops and land
-- [ ] **Governance**: DAO governance with HARVEST tokens
-
-### Phase 3 Features
-- [ ] **Cross-chain**: Deploy on multiple networks
-- [ ] **Mobile App**: React Native mobile application
-- [ ] **Real Farm Integration**: Connect with actual farms
-- [ ] **IoT Integration**: Real-world sensor data
-
-### Technical Improvements
-- [ ] **Layer 2**: Deploy on Polygon/Arbitrum for lower fees
-- [ ] **Oracle Integration**: Real-world price feeds
-- [ ] **Advanced Analytics**: Yield optimization tools
-- [ ] **API Development**: RESTful API for dApp integration
-
 ## API Reference
 
 ### HarvestToken Functions
@@ -346,9 +320,6 @@ function plantCrop(CropType cropType) external
 function harvestCrop(uint256 tokenId) external
 function waterCrop(uint256 tokenId) external
 ```
-
-## ⚠️ Important Notes
-
 ### Gas Optimization
 - Batch operations when possible
 - Use `callStatic` for read-only calls
