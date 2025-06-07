@@ -320,22 +320,8 @@ function plantCrop(CropType cropType) external
 function harvestCrop(uint256 tokenId) external
 function waterCrop(uint256 tokenId) external
 ```
-### Gas Optimization
-- Batch operations when possible
-- Use `callStatic` for read-only calls
-- Consider gas price optimization for mainnet
-
 ### Best Practices
-- Always check transaction receipts
-- Implement proper error handling
-- Use events for off-chain monitoring
-- Regular contract interaction monitoring
-
-### Risk Warnings
-- Smart contracts are immutable once deployed
-- Always test on testnet first
-- Be aware of impermanent loss in liquidity provision
-- Monitor for potential exploits or bugs
+- Always check t
 
 ## 🏆 Achievements
 
