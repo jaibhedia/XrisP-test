@@ -88,11 +88,11 @@ This project implements a complete blockchain-based farming reward system inspir
 
 1. **Clone the repository**
 ```bash
-git clone <your-repo-url>
-cd xrisp-test
+git clone https://github.com/jaibhedia/XrisP-test.git
+cd XrisP-test
 ```
 
-2. **Install dependencies**
+2. **Install dependencies** 
 ```bash
 npm install
 ```
