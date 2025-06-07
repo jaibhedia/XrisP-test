@@ -320,9 +320,6 @@ function plantCrop(CropType cropType) external
 function harvestCrop(uint256 tokenId) external
 function waterCrop(uint256 tokenId) external
 ```
-### Best Practices
-- Always check t
-
 ## 🏆 Achievements
 
 This project demonstrates:
