@@ -7,7 +7,7 @@ async function main() {
   // Get the deployer account
   const [deployer] = await ethers.getSigners();
   console.log("📝 Deploying contracts with account:", deployer.address);
-  console.log("💰 Account balance:", ethers.utils.formatEther(await deployer.getBalance()), "BNB");
+  console.log("💰 Account balance:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "BNB");
   
   // Deployment addresses for tokenomics
   const teamWallet = process.env.TEAM_WALLET || deployer.address;
@@ -25,9 +25,9 @@ async function main() {
     liquidityWallet,
     reserveWallet
   );
-  await harvestToken.deployed();
+  await harvestToken.waitForDeployment();
   
-  console.log("✅ Harvest Token deployed to:", harvestToken.address);
+  console.log("✅ Harvest Token deployed to:", await harvestToken.getAddress());
   console.log("   Team Wallet:", teamWallet);
   console.log("   Marketing Wallet:", marketingWallet);
   console.log("   Liquidity Wallet:", liquidityWallet);
@@ -37,35 +37,39 @@ async function main() {
   console.log("🌱 Deploying Crop NFT...");
   const CropNFT = await ethers.getContractFactory("CropNFT");
   const cropNFT = await CropNFT.deploy();
-  await cropNFT.deployed();
+  await cropNFT.waitForDeployment();
   
-  console.log("✅ Crop NFT deployed to:", cropNFT.address);
+  console.log("✅ Crop NFT deployed to:", await cropNFT.getAddress());
   
   // Deploy Farm Reward System
   console.log("🚜 Deploying Farm Reward System...");
   const FarmRewardSystem = await ethers.getContractFactory("FarmRewardSystem");
   const farmRewardSystem = await FarmRewardSystem.deploy(
-    harvestToken.address,
-    cropNFT.address
+    await harvestToken.getAddress(),
+    await cropNFT.getAddress()
   );
-  await farmRewardSystem.deployed();
+  await farmRewardSystem.waitForDeployment();
   
-  console.log("✅ Farm Reward System deployed to:", farmRewardSystem.address);
+  console.log("✅ Farm Reward System deployed to:", await farmRewardSystem.getAddress());
   
   // Setup contract connections
   console.log("🔗 Setting up contract connections...");
   
   // Set Farm Reward System as reward pool in Harvest Token
-  await harvestToken.setRewardPool(farmRewardSystem.address);
+  await harvestToken.setRewardPool(await farmRewardSystem.getAddress());
   console.log("   ✓ Set Farm Reward System as reward pool");
   
   // Add Farm Reward System as authorized minter
-  await harvestToken.addAuthorizedMinter(farmRewardSystem.address);
+  await harvestToken.addAuthorizedMinter(await farmRewardSystem.getAddress());
   console.log("   ✓ Added Farm Reward System as authorized minter");
   
   // Add Farm Reward System as authorized farm in Crop NFT
-  await cropNFT.addAuthorizedFarm(farmRewardSystem.address);
+  await cropNFT.addAuthorizedFarm(await farmRewardSystem.getAddress());
   console.log("   ✓ Added Farm Reward System as authorized farm");
+  
+  // Set Farm Reward System address in Crop NFT
+  await cropNFT.setFarmRewardSystem(await farmRewardSystem.getAddress());
+  console.log("   ✓ Set Farm Reward System address in Crop NFT");
   
   // Verify initial token distribution
   console.log("📊 Verifying token distribution...");
@@ -74,52 +78,51 @@ async function main() {
   const marketingBalance = await harvestToken.balanceOf(marketingWallet);
   const liquidityBalance = await harvestToken.balanceOf(liquidityWallet);
   const reserveBalance = await harvestToken.balanceOf(reserveWallet);
-  const rewardPoolBalance = await harvestToken.balanceOf(farmRewardSystem.address);
+  const rewardPoolBalance = await harvestToken.balanceOf(await farmRewardSystem.getAddress());
   
-  console.log("   Total Supply:", ethers.utils.formatEther(totalSupply), "HARVEST");
-  console.log("   Team Balance:", ethers.utils.formatEther(teamBalance), "HARVEST");
-  console.log("   Marketing Balance:", ethers.utils.formatEther(marketingBalance), "HARVEST");
-  console.log("   Liquidity Balance:", ethers.utils.formatEther(liquidityBalance), "HARVEST");
-  console.log("   Reserve Balance:", ethers.utils.formatEther(reserveBalance), "HARVEST");
-  console.log("   Reward Pool Balance:", ethers.utils.formatEther(rewardPoolBalance), "HARVEST");
+  console.log("   Total Supply:", ethers.formatEther(totalSupply), "HARVEST");
+  console.log("   Team Balance:", ethers.formatEther(teamBalance), "HARVEST");
+  console.log("   Marketing Balance:", ethers.formatEther(marketingBalance), "HARVEST");
+  console.log("   Liquidity Balance:", ethers.formatEther(liquidityBalance), "HARVEST");
+  console.log("   Reserve Balance:", ethers.formatEther(reserveBalance), "HARVEST");
+  console.log("   Reward Pool Balance:", ethers.formatEther(rewardPoolBalance), "HARVEST");
   
   // Display deployment summary
-  console.log("\\n🎉 DEPLOYMENT COMPLETED SUCCESSFULLY!");
+  console.log("\n🎉 DEPLOYMENT COMPLETED SUCCESSFULLY!");
   console.log("====================================");
   console.log("Contract Addresses:");
-  console.log("• Harvest Token:", harvestToken.address);
-  console.log("• Crop NFT:", cropNFT.address);
-  console.log("• Farm Reward System:", farmRewardSystem.address);
+  console.log("• Harvest Token:", await harvestToken.getAddress());
+  console.log("• Crop NFT:", await cropNFT.getAddress());
+  console.log("• Farm Reward System:", await farmRewardSystem.getAddress());
   console.log("====================================");
-  
-  // Save deployment info
-  const deploymentInfo = {
-    network: hre.network.name,
-    chainId: (await ethers.provider.getNetwork()).chainId,
-    deployer: deployer.address,
-    timestamp: new Date().toISOString(),
-    contracts: {
-      HarvestToken: harvestToken.address,
-      CropNFT: cropNFT.address,
-      FarmRewardSystem: farmRewardSystem.address
-    },
-    wallets: {
-      team: teamWallet,
-      marketing: marketingWallet,
-      liquidity: liquidityWallet,
-      reserve: reserveWallet
-    }
-  };
-  
-  console.log("\\n📝 Deployment info saved:");
-  console.log(JSON.stringify(deploymentInfo, null, 2));
+  // Replace lines around 119 in deploy.js with this:
+const deploymentInfo = {
+  network: hre.network.name,
+  chainId: Number((await ethers.provider.getNetwork()).chainId), // Convert BigInt to Number
+  deployer: deployer.address,
+  timestamp: new Date().toISOString(),
+  contracts: {
+    HarvestToken: await harvestToken.getAddress(),
+    CropNFT: await cropNFT.getAddress(),
+    FarmRewardSystem: await farmRewardSystem.getAddress()
+  },
+  wallets: {
+    team: teamWallet,
+    marketing: marketingWallet,
+    liquidity: liquidityWallet,
+    reserve: reserveWallet
+  }
+};
+
+console.log("\n📝 Deployment info saved:");
+console.log(JSON.stringify(deploymentInfo, null, 2));
   
   // Verification instructions
   if (hre.network.name !== "hardhat") {
-    console.log("\\n🔍 To verify contracts on BSCScan, run:");
-    console.log(`npx hardhat verify --network ${hre.network.name} ${harvestToken.address} "${teamWallet}" "${marketingWallet}" "${liquidityWallet}" "${reserveWallet}"`);
-    console.log(`npx hardhat verify --network ${hre.network.name} ${cropNFT.address}`);
-    console.log(`npx hardhat verify --network ${hre.network.name} ${farmRewardSystem.address} "${harvestToken.address}" "${cropNFT.address}"`);
+    console.log("\n🔍 To verify contracts on BSCScan, run:");
+    console.log(`npx hardhat verify --network ${hre.network.name} ${await harvestToken.getAddress()} "${teamWallet}" "${marketingWallet}" "${liquidityWallet}" "${reserveWallet}"`);
+    console.log(`npx hardhat verify --network ${hre.network.name} ${await cropNFT.getAddress()}`);
+    console.log(`npx hardhat verify --network ${hre.network.name} ${await farmRewardSystem.getAddress()} "${await harvestToken.getAddress()}" "${await cropNFT.getAddress()}"`);
   }
   
   return deploymentInfo;
